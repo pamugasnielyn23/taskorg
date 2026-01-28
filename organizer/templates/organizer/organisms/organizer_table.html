@@ -1,0 +1,19 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Due</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+            {% include 'organizer/molecules/organizer_row.html' %}
+        {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No tasks found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

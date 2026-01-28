@@ -1,0 +1,656 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Organizer{% endblock %}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Premium Color Palette - Light Mode */
+            --brand-primary: hsl(260, 70%, 60%);
+            --brand-primary-dark: hsl(260, 70%, 50%);
+            --brand-secondary: hsl(280, 60%, 65%);
+
+            --bg-primary: hsl(220, 33%, 98%);
+            --bg-card: hsla(0, 0%, 100%, 0.8);
+            --bg-glass: hsla(0, 0%, 100%, 0.7);
+            --bg-hover: hsl(220, 33%, 96%);
+
+            --text-primary: hsl(220, 40%, 15%);
+            --text-secondary: hsl(220, 20%, 45%);
+            --text-muted: hsl(220, 15%, 65%);
+
+            --border-color: hsla(220, 30%, 90%, 0.8);
+            --glass-border: hsla(0, 0%, 100%, 0.5);
+
+            --success: hsl(160, 80%, 40%);
+            --warning: hsl(40, 95%, 50%);
+            --danger: hsl(0, 85%, 60%);
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+
+            --blur: saturate(180%) blur(12px);
+        }
+
+        [data-theme="dark"] {
+            /* Premium Color Palette - Dark Mode */
+            --bg-primary: hsl(222, 47%, 11%);
+            --bg-card: hsla(222, 47%, 15%, 0.8);
+            --bg-glass: hsla(222, 47%, 15%, 0.6);
+            --bg-hover: hsl(222, 47%, 20%);
+
+            --text-primary: hsl(210, 40%, 98%);
+            --text-secondary: hsl(215, 20%, 75%);
+            --text-muted: hsl(215, 15%, 55%);
+
+            --border-color: hsla(217, 32%, 20%, 0.6);
+            --glass-border: hsla(217, 32%, 30%, 0.3);
+
+            --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .nav-brand {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-md);
+        }
+
+        /* Navigation Overhaul */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-brand:hover {
+            transform: scale(1.02);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        /* Premium Buttons */
+        .btn-premium {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.2);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3);
+            filter: brightness(1.1);
+        }
+
+        /* Theme Toggle Premium */
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--brand-primary);
+            color: white;
+            border-color: var(--brand-primary);
+            transform: rotate(12deg);
+        }
+
+        /* User Dropdown Premium */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-hover);
+            border: 1px solid transparent;
+        }
+
+        .dropdown-toggle:hover {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-family: 'Outfit';
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 240px;
+            background: var(--bg-card);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--brand-primary);
+            padding-left: 1.25rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem;
+        }
+
+        .dropdown-item-danger {
+            color: var(--danger);
+        }
+
+        /* Container & Alerts */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            animation: slideDown 0.4s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: hsla(160, 80%, 40%, 0.1);
+            color: var(--success);
+            border: 1px solid hsla(160, 80%, 40%, 0.2);
+        }
+
+        .alert-error {
+            background: hsla(0, 85%, 60%, 0.1);
+            color: var(--danger);
+            border: 1px solid hsla(0, 85%, 60%, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        /* Pomodoro Floating Island */
+        .pomodoro-island {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 300px;
+            padding: 1.5rem;
+            z-index: 2000;
+            display: none;
+            animation: islandIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes islandIn {
+            from {
+                transform: translateY(100px) scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .island-timer {
+            font-family: 'Outfit';
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            top: 0;
+            left: 0;
+            border: 2px solid var(--brand-primary);
+            opacity: 0;
+            pointer-events: none;
+            /* Critical: Prevent click blocking */
+        }
+
+        .active .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% block navbar %}
+    <nav>
+        <div class="nav-container">
+            <a href="{% url 'organizer_dashboard' %}" class="nav-brand">
+                <span>📋</span> TASK.IO
+            </a>
+
+            <div class="nav-right">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <span id="theme-icon">🌙</span>
+                </button>
+
+                {% if user.is_authenticated %}
+                <div class="user-dropdown">
+                    <div class="dropdown-toggle">
+                        <div class="user-avatar">
+                            {{ user.username|upper|slice:":1" }}
+                        </div>
+                        <div class="user-info">
+                            <span class="user-label">Authorized</span>
+                            <span class="user-name">{{ user.username }}</span>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-menu">
+                        <div
+                            style="padding: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.5rem;">
+                            <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-primary);">{{
+                                user.username }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}</div>
+                        </div>
+                        <a href="{% url 'profile' %}" class="dropdown-item">
+                            <span>👤</span> Profile Settings
+                        </a>
+                        <a href="{% url 'organizer_dashboard' %}?view=today" class="dropdown-item">
+                            <span>📅</span> Today's Tasks
+                        </a>
+                        <a href="{% url 'vault_list' %}" class="dropdown-item">
+                            <span>📦</span> Archived Tasks
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'logout' %}" class="dropdown-item dropdown-item-danger">
+                            <span>🚪</span> Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn-premium">🔐 Access Workspace</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <div class="container" id="main-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {% if message.tags == 'success' %}✨{% else %}⚠️{% endif %}
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Pomodoro Floating Island UI (Global) -->
+    <div id="pomodoroIsland" class="glass-card pomodoro-island">
+        <div class="pulse-ring"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div
+                style="font-size: 0.7rem; font-weight: 800; color: var(--brand-primary); letter-spacing: 0.1em; text-transform: uppercase;">
+                Focus Session Active
+            </div>
+            <button onclick="closeFocus()"
+                style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem;">&times;</button>
+        </div>
+        <div id="focusTaskDisplay"
+            style="font-weight: 700; font-size: 0.9rem; text-align: center; color: var(--text-primary); margin-bottom: 0.5rem;">
+            Task Name</div>
+        <div class="island-timer" id="timerDisplay">25:00</div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-premium" id="timerStartBtn" onclick="toggleTimer()"
+                style="flex: 1; padding: 0.6rem;">START</button>
+            <button class="task-action-btn" onclick="resetTimer()"
+                style="flex: 0.5; font-size: 0.7rem; border-radius: 8px; border: 1px solid var(--border-color);">RESET</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+
+        let timerInterval;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+
+        function startFocus(taskName) {
+            document.getElementById('focusTaskDisplay').textContent = taskName;
+            const island = document.getElementById('pomodoroIsland');
+            island.style.display = 'block';
+            resetTimer();
+            localStorage.setItem('focusTask', taskName);
+            localStorage.setItem('focusActive', 'true');
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerStartBtn');
+            const island = document.getElementById('pomodoroIsland');
+            if (isRunning) {
+                clearInterval(timerInterval);
+                btn.textContent = 'RESUME';
+                island.classList.remove('active');
+                localStorage.setItem('focusRunning', 'false');
+                localStorage.setItem('focusTimeLeft', timeLeft);
+                localStorage.removeItem('focusEndTime');
+            } else {
+                island.classList.add('active');
+                const endTime = Date.now() + (timeLeft * 1000);
+                localStorage.setItem('focusEndTime', endTime);
+                localStorage.setItem('focusRunning', 'true');
+                localStorage.removeItem('focusTimeLeft');
+
+                startInterval();
+                btn.textContent = 'PAUSE';
+            }
+            isRunning = !isRunning;
+        }
+
+        function startInterval() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Focus cycle complete. Optimal rest interval recommended.");
+                    resetTimer();
+                    return;
+                }
+                timeLeft--;
+                displayTime();
+            }, 1000);
+        }
+
+        function displayTime() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 25 * 60;
+            isRunning = false;
+            displayTime();
+            document.getElementById('timerStartBtn').textContent = 'START';
+            document.getElementById('pomodoroIsland').classList.remove('active');
+            localStorage.setItem('focusRunning', 'false');
+            localStorage.setItem('focusTimeLeft', timeLeft);
+            localStorage.removeItem('focusEndTime');
+        }
+
+        function closeFocus() {
+            document.getElementById('pomodoroIsland').style.display = 'none';
+            clearInterval(timerInterval);
+            localStorage.removeItem('focusActive');
+            localStorage.removeItem('focusRunning');
+            localStorage.removeItem('focusEndTime');
+            localStorage.removeItem('focusTimeLeft');
+            localStorage.removeItem('focusTask');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            // Persistent Timer Initialization
+            const isFocusActive = localStorage.getItem('focusActive') === 'true';
+            if (isFocusActive) {
+                document.getElementById('pomodoroIsland').style.display = 'block';
+                const taskName = localStorage.getItem('focusTask') || 'Focus Session';
+                document.getElementById('focusTaskDisplay').textContent = taskName;
+
+                const isTimerRunning = localStorage.getItem('focusRunning') === 'true';
+                if (isTimerRunning) {
+                    const endTime = parseInt(localStorage.getItem('focusEndTime'));
+                    const now = Date.now();
+                    timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+
+                    if (timeLeft > 0) {
+                        isRunning = true;
+                        document.getElementById('timerStartBtn').textContent = 'PAUSE';
+                        document.getElementById('pomodoroIsland').classList.add('active');
+                        displayTime();
+                        startInterval();
+                    } else {
+                        resetTimer();
+                    }
+                } else {
+                    timeLeft = parseInt(localStorage.getItem('focusTimeLeft')) || 25 * 60;
+                    displayTime();
+                    document.getElementById('timerStartBtn').textContent = 'RESUME';
+                }
+            }
+
+            // Subtle Fade In effect
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.style.opacity = '0';
+                setTimeout(() => {
+                    mainContent.style.transition = 'opacity 0.6s ease';
+                    mainContent.style.opacity = '1';
+                }, 50);
+            }
+        });
+    </script>
+</body>
+
+</html>

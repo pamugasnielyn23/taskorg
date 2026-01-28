@@ -1,0 +1,17 @@
+*.pyc
+*~
+__pycache__/
+.DS_Store
+db.sqlite3
+.env
+venv/
+.venv/
+env/
+.vscode/
+.idea/
+*.log
+media/
+staticfiles/
+.gemini/
+brain/
+recordings/

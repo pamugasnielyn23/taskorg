@@ -1,0 +1,181 @@
+{% extends "organizer/base.html" %}
+
+{% block title %}Today's Directives | TASK.IO{% endblock %}
+
+{% block content %}
+<style>
+    .focus-header {
+        margin-bottom: 3rem;
+        text-align: center;
+        animation: fadeInDown 0.6s ease;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .focus-header h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .date-pill {
+        display: inline-block;
+        padding: 0.4rem 1.25rem;
+        background: var(--bg-hover);
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .directive-list {
+        display: grid;
+        gap: 1.25rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .directive-item {
+        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .directive-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: var(--brand-primary);
+    }
+
+    .directive-item.priority-high::before {
+        background: var(--danger);
+    }
+
+    .directive-item.priority-medium::before {
+        background: var(--warning);
+    }
+
+    .directive-item.priority-low::before {
+        background: var(--success);
+    }
+
+    .directive-item:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow-lg);
+        background: var(--bg-card);
+    }
+
+    .directive-content h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--text-primary);
+    }
+
+    .directive-sub {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .empty-focus {
+        text-align: center;
+        padding: 6rem 2rem;
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="focus-header">
+    <h1>TODAY'S FOCUS</h1>
+    <div class="date-pill">{% now "l, F d, Y" %}</div>
+</div>
+
+<div class="directive-list">
+    {% if tasks %}
+    {% for task in tasks %}
+    <div class="glass-card directive-item priority-{{ task.priority|lower }}">
+        <div class="directive-content">
+            <h3>{{ task.title }}</h3>
+            <div class="directive-sub">
+                {{ task.category|default:"General" }} • {{ task.status|upper }}
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <button class="task-action-btn" onclick="startFocus('{{ task.title|escapejs }}')"
+                style="background: hsla(260, 70%, 60%, 0.1); border-color: transparent; color: var(--brand-primary); padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; cursor: pointer;">
+                ⏱️ FOCUS
+            </button>
+            <button class="btn-premium" onclick="location.href='{% url 'task_complete' task.pk %}'"
+                style="padding: 0.6rem 1.25rem; font-size: 0.8rem;">
+                ✅ COMPLETE
+            </button>
+            <a href="{% url 'task_update' task.pk %}" class="btn-premium"
+                style="background: var(--bg-hover); color: var(--text-secondary); padding: 0.6rem; box-shadow: none;">
+                ✏️
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="glass-card empty-focus">
+        <div style="font-size: 4rem; margin-bottom: 1.5rem;">🌌</div>
+        <h2 style="font-family: 'Outfit'; margin-bottom: 1rem;">CLARITY ACHIEVED</h2>
+        <p style="color: var(--text-muted); font-weight: 500;">No high-priority objectives detected for this rotation.
+        </p>
+        <a href="{% url 'organizer_dashboard' %}" class="btn-premium" style="margin-top: 2rem;">RETURN TO BASE</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.directive-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(15px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.4s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    });
+</script>
+{% endblock %}

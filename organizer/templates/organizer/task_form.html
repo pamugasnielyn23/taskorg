@@ -1,0 +1,337 @@
+﻿{% extends "organizer/base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Mission{% else %}New Mission{% endif %} | TASK.IO{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<style>
+    .form-focus-wrapper {
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .premium-form-card {
+        width: 100%;
+        max-width: 600px;
+        padding: 0;
+        overflow: hidden;
+        animation: formIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes formIn {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .form-gradient-header {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        padding: 2.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .form-gradient-header h2 {
+        color: white;
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .form-gradient-header p {
+        color: hsla(0, 0%, 100%, 0.8);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .form-content-area {
+        padding: 2.5rem;
+    }
+
+    /* Premium Input Styling */
+    .field-wrapper {
+        margin-bottom: 2rem;
+    }
+
+    .field-wrapper label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.75rem;
+    }
+
+    .premium-input {
+        width: 100%;
+        background: var(--bg-hover);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .premium-input:focus {
+        background: var(--bg-card);
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 4px hsla(260, 70%, 60%, 0.1);
+        outline: none;
+    }
+
+    .premium-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1.25rem center;
+        background-size: 1.25rem;
+    }
+
+    /* Subtask Component Premium */
+    .subtask-container {
+        border-top: 1px solid var(--border-color);
+        margin-top: 2rem;
+        padding-top: 2rem;
+    }
+
+    .subtask-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        animation: itemIn 0.3s ease;
+    }
+
+    @keyframes itemIn {
+        from {
+            transform: translateX(-10px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .cb-wrapper {
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .cb-wrapper.checked {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: white;
+    }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.2s;
+    }
+
+    .btn-remove:hover {
+        color: var(--danger);
+    }
+
+    .btn-add-item {
+        background: none;
+        border: 1px dashed var(--brand-primary);
+        color: var(--brand-primary);
+        padding: 0.75rem;
+        width: 100%;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-add-item:hover {
+        background: hsla(260, 70%, 60%, 0.05);
+        transform: scale(0.99);
+    }
+
+    .form-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 3rem;
+    }
+
+    .btn-secondary {
+        background: var(--bg-hover);
+        color: var(--text-secondary);
+        box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+        background: var(--border-color);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .error-msg {
+        color: var(--danger);
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<div class="form-focus-wrapper">
+    <div class="glass-card premium-form-card">
+        <div class="form-gradient-header">
+            <h2>{% if form.instance.pk %}EDIT MISSION{% else %}NEW MISSION{% endif %}</h2>
+            <p>Define your core objectives and parameters.</p>
+        </div>
+
+        <form method="post" class="form-content-area" id="taskForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="field-wrapper">
+                <label>Mission Identifier</label>
+                {{ form.title }}
+                {% if form.title.errors %}<div class="error-msg">{{ form.title.errors }}</div>{% endif %}
+            </div>
+
+            <div class="field-wrapper">
+                <label>Briefing / Details</label>
+                {{ form.description }}
+                {% if form.description.errors %}<div class="error-msg">{{ form.description.errors }}</div>{% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="field-wrapper">
+                    <label>Deployment Date</label>
+                    {{ form.due_date }}
+                </div>
+                <div class="field-wrapper">
+                    <label>Priority Tier</label>
+                    {{ form.priority }}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="field-wrapper">
+                    <label>Mission Status</label>
+                    {{ form.status }}
+                </div>
+                <div class="field-wrapper">
+                    <label>Registry / Category</label>
+                    {{ form.category }}
+                </div>
+            </div>
+
+            <div class="field-wrapper">
+                <label>🔁 Recurrence Protocol</label>
+                {{ form.recurrence }}
+                {% if form.recurrence.errors %}<div class="error-msg">{{ form.recurrence.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Enhanced Subtasks Section -->
+            <div class="subtask-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <label
+                        style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Checkpoint
+                        Checklist</label>
+                    <button type="button" class="btn-add-item" onclick="addSubtask()"
+                        style="width: auto; margin: 0; padding: 0.4rem 1rem;">+ NEW ITEM</button>
+                </div>
+
+                <div id="subtasksList">
+                    {% if form.instance.pk %}
+                    {% for subtask in form.instance.subtasks.all %}
+                    <div class="subtask-item">
+                        <div class="cb-wrapper {% if subtask.is_completed %}checked{% endif %}"
+                            onclick="toggleCb(this)">
+                            {% if subtask.is_completed %}✓{% endif %}
+                        </div>
+                        <input type="hidden" name="subtask_completed[]"
+                            value="{% if subtask.is_completed %}true{% else %}false{% endif %}">
+                        <input type="text" name="subtasks[]" value="{{ subtask.title }}" class="premium-input"
+                            style="padding: 0.6rem 1rem;">
+                        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <a href="{% url 'organizer_dashboard' %}" class="btn-premium btn-secondary">ABORT</a>
+                <button type="submit" class="btn-premium">EXECUTE</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Apply premium classes to Django form widgets
+    document.addEventListener('DOMContentLoaded', () => {
+        const fields = document.querySelectorAll('#taskForm input, #taskForm textarea, #taskForm select');
+        fields.forEach(f => {
+            if (!f.classList.contains('premium-input')) {
+                f.classList.add('premium-input');
+                if (f.tagName === 'SELECT') f.classList.add('premium-select');
+            }
+        });
+    });
+
+    function addSubtask() {
+        const container = document.getElementById('subtasksList');
+        const div = document.createElement('div');
+        div.className = 'subtask-item';
+        div.innerHTML = `
+            <div class="cb-wrapper" onclick="toggleCb(this)"></div>
+            <input type="hidden" name="subtask_completed[]" value="false">
+            <input type="text" name="subtasks[]" class="premium-input" placeholder="Enter objective..." style="padding: 0.6rem 1rem;">
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+        `;
+        container.appendChild(div);
+        div.querySelector('input[type="text"]').focus();
+    }
+
+    function toggleCb(el) {
+        const isChecked = el.classList.toggle('checked');
+        el.innerHTML = isChecked ? '✓' : '';
+        el.nextElementSibling.value = isChecked ? 'true' : 'false';
+    }
+
+    // Capture standard form submission to ensure subtasks are handled correctly if needed
+    // (Existing backend handles name="subtasks[]" and name="subtask_completed[]")
+</script>
+{% endblock %}

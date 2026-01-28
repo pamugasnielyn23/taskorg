@@ -1,0 +1,235 @@
+{% extends 'security_management/base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<style>
+    .edit-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 3rem 2rem;
+        min-height: calc(100vh - 100px);
+    }
+
+    .edit-card {
+        width: 100%;
+        max-width: 600px;
+        padding: 3rem;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .edit-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .edit-header h1 {
+        font-family: 'Outfit';
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .edit-header p {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .avatar-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-family: 'Outfit';
+        font-weight: 800;
+        color: white;
+        box-shadow: 0 10px 30px hsla(260, 70%, 60%, 0.2);
+        overflow: hidden;
+    }
+
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-controls {
+        text-align: center;
+    }
+
+    .avatar-controls h3 {
+        font-family: 'Outfit';
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .avatar-controls p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-family: 'Outfit';
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        margin-bottom: 0.6rem;
+        padding-left: 0.25rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: var(--bg-hover);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        background: var(--bg-card);
+        border-color: var(--brand-primary);
+        outline: none;
+        box-shadow: 0 0 0 4px hsla(260, 70%, 60%, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-back {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 700;
+        font-family: 'Outfit';
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        transition: color 0.2s;
+    }
+
+    .btn-back:hover {
+        color: var(--brand-primary);
+    }
+</style>
+
+<div class="edit-wrapper">
+    <div style="width: 100%; max-width: 600px;">
+        <a href="{% url 'profile' %}" class="btn-back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            BACK TO PROFILE
+        </a>
+
+        <div class="glass-card edit-card">
+            <div class="edit-header">
+                <h1>✏️ Edit Profile</h1>
+                <p>Update your personal information</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="avatar-section">
+                    <div class="avatar-preview">
+                        {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+                        {% else %}
+                        {{ request.user.username|upper|slice:":1" }}
+                        {% endif %}
+                    </div>
+                    <div class="avatar-controls">
+                        <h3>Profile Picture</h3>
+                        <p>Format: JPG, PNG, GIF. Max Size: 2MB.</p>
+                        <div style="max-width: 200px; margin: 0 auto;">
+                            {{ form.profile_picture }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem;">{{
+                            form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="id_first_name">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_last_name">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_email">Email Address</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_bio">Bio</label>
+                        {{ form.bio }}
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'profile' %}" class="btn-premium"
+                            style="background: var(--bg-hover); color: var(--text-secondary); box-shadow: none; flex: 1; justify-content: center;">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-premium" style="flex: 2; justify-content: center;">
+                            💾 Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

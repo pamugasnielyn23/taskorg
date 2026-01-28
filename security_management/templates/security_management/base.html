@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Task Organizer{% endblock %}</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      /* Premium Color Palette - Light Mode */
+      --brand-primary: hsl(260, 70%, 60%);
+      --brand-primary-dark: hsl(260, 70%, 50%);
+      --brand-secondary: hsl(280, 60%, 65%);
+
+      --bg-primary: hsl(220, 33%, 98%);
+      --bg-card: hsla(0, 0%, 100%, 0.8);
+      --bg-glass: hsla(0, 0%, 100%, 0.7);
+      --bg-hover: hsl(220, 33%, 96%);
+
+      --text-primary: hsl(220, 40%, 15%);
+      --text-secondary: hsl(220, 20%, 45%);
+      --text-muted: hsl(220, 15%, 65%);
+
+      --border-color: hsla(220, 30%, 90%, 0.8);
+      --glass-border: hsla(0, 0%, 100%, 0.5);
+
+      --success: hsl(160, 80%, 40%);
+      --danger: hsl(0, 80%, 60%);
+    }
+
+    [data-theme="dark"] {
+      --brand-primary: hsl(260, 80%, 70%);
+      --brand-secondary: hsl(280, 70%, 75%);
+
+      --bg-primary: hsl(220, 40%, 8%);
+      --bg-card: hsla(220, 40%, 12%, 0.8);
+      --bg-glass: hsla(220, 40%, 10%, 0.7);
+      --bg-hover: hsl(220, 35%, 15%);
+
+      --text-primary: hsl(220, 30%, 95%);
+      --text-secondary: hsl(220, 15%, 75%);
+      --text-muted: hsl(220, 10%, 55%);
+
+      --border-color: hsla(220, 30%, 20%, 0.8);
+      --glass-border: hsla(220, 30%, 25%, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      color: var(--text-primary);
+      transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px 0 hsla(220, 40%, 10%, 0.05);
+    }
+
+    /* Clean Navbar */
+    .navbar {
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      font-family: 'Outfit';
+      font-weight: 800;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .btn-premium {
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-family: 'Outfit';
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      box-shadow: 0 4px 15px hsla(260, 70%, 60%, 0.3);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px hsla(260, 70%, 60%, 0.4);
+      filter: brightness(1.1);
+      color: white;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1.2rem;
+    }
+
+    /* Alert Alert styling */
+    .alert-custom {
+      background: var(--bg-card);
+      border: 1px solid var(--success);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-custom .btn-close {
+      margin-left: auto;
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+      .navbar .container {
+        padding: 0 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .nav-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+      }
+
+      .nav-btn span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        📋 TASK.IO
+      </a>
+
+      <div class="nav-links" style="display: flex; gap: 1rem; align-items: center;">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+          <span id="theme-icon">🌙</span>
+        </button>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}"
+          style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Login</a>
+        <a href="{% url 'register' %}" class="btn-premium">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert-custom">
+      ✅ {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        style="font-size: 0.7rem;"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('theme-icon');
+      if (icon) {
+        icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    });
+  </script>
+</body>
+
+</html>

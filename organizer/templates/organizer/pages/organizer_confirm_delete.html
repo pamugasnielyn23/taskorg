@@ -1,0 +1,11 @@
+{% extends "organizer/base.html" %}
+{% block content %}
+<h2>Delete Task</h2>
+<p>Are you sure you want to delete "{{ task.title }}"?</p>
+
+<form method="POST">
+  {% csrf_token %}
+  <button type="submit">Yes, delete</button>
+  <a href="{% url 'organizer_list' %}">Cancel</a>
+</form>
+{% endblock %}

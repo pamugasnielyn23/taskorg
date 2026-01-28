@@ -1,0 +1,179 @@
+{% extends "organizer/base.html" %}
+
+{% block title %}Mission Archives | TASK.IO{% endblock %}
+
+{% block content %}
+<style>
+    .vault-header {
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .vault-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .vault-title h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+    }
+
+    .count-indicator {
+        padding: 0.5rem 1.25rem;
+        background: var(--brand-primary);
+        color: white;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1rem;
+        font-family: 'Outfit';
+        box-shadow: 0 4px 15px hsla(260, 70%, 60%, 0.3);
+    }
+
+    .vault-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .archived-item {
+        padding: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        opacity: 0.7;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .archived-item:hover {
+        opacity: 1;
+        transform: scale(1.01);
+        border-color: var(--brand-primary);
+    }
+
+    .item-info h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .item-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .vault-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-restore {
+        background: hsla(160, 80%, 40%, 0.1);
+        color: var(--success);
+        border: 1px solid transparent;
+    }
+
+    .btn-restore:hover {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-purge {
+        background: var(--bg-hover);
+        color: var(--danger);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-purge:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+    }
+
+    .empty-vault {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 8rem 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .vault-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .archived-item {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+
+        .vault-actions {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+</style>
+
+<div class="vault-header">
+    <div class="vault-title">
+        <h1>MISSION ARCHIVES</h1>
+        <div class="count-indicator">{{ tasks.count }}</div>
+    </div>
+</div>
+
+<div class="vault-grid">
+    {% if tasks %}
+    {% for task in tasks %}
+    <div class="glass-card archived-item">
+        <div class="item-info">
+            <h3>{{ task.title }}</h3>
+            <div class="item-meta">
+                {{ task.category|default:"General" }} • DEPLOYED {{ task.created_at|date:"M Y" }}
+            </div>
+        </div>
+        <div class="vault-actions">
+            <a href="{% url 'task_unvault' task.pk %}" class="btn-premium btn-restore"
+                style="padding: 0.6rem 1rem; font-size: 0.75rem;">
+                ↩️ RESTORE
+            </a>
+            <a href="{% url 'task_delete' task.pk %}" class="btn-premium btn-purge"
+                style="padding: 0.6rem; box-shadow: none;">
+                🗑️
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="glass-card empty-vault">
+        <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">📦</div>
+        <h2 style="font-family: 'Outfit'; color: var(--text-muted);">ARCHIVES DESERTED</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Commence operations to populate your
+            archives.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.archived-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.4s ease';
+                item.style.opacity = '0.7'; // Base opacity for archived items
+                item.style.transform = 'translateY(0)';
+            }, 80 * index);
+        });
+    });
+</script>
+{% endblock %}
