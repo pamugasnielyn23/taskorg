@@ -6,118 +6,189 @@
 <style>
     .delete-container {
         max-width: 500px;
-        margin: 3rem auto;
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin: 4rem auto;
+        padding: 2.5rem;
+        border-radius: 24px;
+        background: var(--bg-glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+        animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .delete-icon {
-        font-size: 4rem;
+        font-size: 5rem;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 4px 12px rgba(255, 165, 0, 0.4));
     }
 
     .delete-header {
         text-align: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     .delete-header h2 {
-        color: #f5576c;
-        font-size: 1.8rem;
-        margin-bottom: 0.5rem;
+        font-family: 'Outfit';
+        color: var(--danger);
+        font-size: 2.2rem;
+        margin-bottom: 0.75rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
     }
 
     .delete-message {
         text-align: center;
-        color: #666;
-        margin-bottom: 2rem;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
         line-height: 1.6;
     }
 
     .task-info {
-        background-color: #fff3e0;
-        border-left: 4px solid #ffa500;
-        padding: 1rem;
-        border-radius: 6px;
-        margin-bottom: 2rem;
+        background: var(--bg-hover);
+        border-left: 5px solid #ffa500;
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .task-info:hover {
+        transform: scale(1.02);
     }
 
     .task-info-title {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
+        font-family: 'Outfit';
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .task-info-content {
-        color: #666;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 
     .warning-box {
-        background-color: #ffebee;
-        border: 2px solid #f5576c;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 2rem;
+        background: rgba(255, 71, 87, 0.1);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 2.5rem;
         text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
     }
 
     .warning-text {
-        color: #c62828;
-        font-weight: 600;
+        color: var(--danger);
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(255, 165, 0, 0.15);
+        color: #ffa500;
+        border: 1px solid rgba(255, 165, 0, 0.3);
+    }
+
+    .status-in-progress {
+        background: rgba(0, 123, 255, 0.15);
+        color: #007bff;
+        border: 1px solid rgba(0, 123, 255, 0.3);
+    }
+
+    .status-completed {
+        background: rgba(46, 213, 115, 0.15);
+        color: #2ed573;
+        border: 1px solid rgba(46, 213, 115, 0.3);
     }
 
     .button-group {
         display: flex;
-        gap: 1rem;
+        gap: 1.25rem;
         justify-content: center;
     }
 
     .btn {
         flex: 1;
-        padding: 0.75rem 1.5rem;
+        padding: 1rem 1.5rem;
         border: none;
-        border-radius: 8px;
+        border-radius: 14px;
         font-size: 1rem;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
         text-decoration: none;
         text-align: center;
-        transition: all 0.3s ease;
-        display: inline-block;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Outfit';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-delete {
-        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
     }
 
     .btn-delete:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
     }
 
     .btn-cancel {
-        background-color: #e0e0e0;
-        color: #333;
-        border: 2px solid #bbb;
+        background: var(--bg-hover);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
     }
 
     .btn-cancel:hover {
-        background-color: #f5f5f5;
+        background: var(--bg-card);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-sm);
     }
 
     @media (max-width: 600px) {
         .delete-container {
-            margin: 1rem;
-            padding: 1.5rem;
+            margin: 1.5rem;
+            padding: 2rem;
         }
 
         .delete-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
         }
 
         .button-group {
@@ -135,29 +206,34 @@
 
     <div class="delete-message">
         <p>Are you sure you want to delete this task?</p>
-        <p style="font-size: 0.9rem; color: #999;">This action cannot be undone.</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+            This action is permanent and cannot be undone.
+        </p>
     </div>
 
     <div class="task-info">
-        <div class="task-info-title">📋 Task Details:</div>
+        <div class="task-info-title"><span>📋</span> Task Details:</div>
         <div class="task-info-content">
             <strong>Title:</strong> {{ task.title }}<br>
             {% if task.description %}
-                <strong>Description:</strong> {{ task.description }}<br>
+            <strong>Description:</strong> {{ task.description }}<br>
             {% endif %}
-            <strong>Status:</strong> {{ task.status|default:"Pending" }}<br>
+            <strong>Status:</strong>
+            <span class="status-badge status-{{ task.status|slugify }}">
+                {{ task.status|default:"Pending"|upper }}
+            </span>
         </div>
     </div>
 
     <div class="warning-box">
-        <div class="warning-text">🚨 This will permanently delete the task!</div>
+        <span class="warning-text">🚨 PERMANENT DATA DELETION</span>
     </div>
 
     <form method="POST">
         {% csrf_token %}
         <div class="button-group">
-            <button type="submit" class="btn btn-delete">🗑️ Yes, Delete Task</button>
-            <a href="{% url 'organizer_dashboard' %}" class="btn btn-cancel">❌ Cancel</a>
+            <button type="submit" class="btn btn-delete">🗑️ YES, DELETE TASK</button>
+            <a href="{% url 'organizer_dashboard' %}" class="btn btn-cancel">✕ CANCEL</a>
         </div>
     </form>
 </div>

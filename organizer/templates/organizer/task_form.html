@@ -1,6 +1,6 @@
 ﻿{% extends "organizer/base.html" %}
 
-{% block title %}{% if form.instance.pk %}Edit Mission{% else %}New Mission{% endif %} | TASK.IO{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit Mission{% else %}New Mission{% endif %} | Task Organizer{% endblock %}
 
 {% block navbar %}{% endblock %}
 
@@ -292,8 +292,8 @@
             </div>
 
             <div class="form-footer">
-                <a href="{% url 'organizer_dashboard' %}" class="btn-premium btn-secondary">ABORT</a>
-                <button type="submit" class="btn-premium">EXECUTE</button>
+                <a href="{% url 'organizer_dashboard' %}" class="btn-premium btn-secondary">BACK</a>
+                <button type="submit" class="btn-premium">ADD TASK</button>
             </div>
         </form>
     </div>

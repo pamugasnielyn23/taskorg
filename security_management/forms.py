@@ -37,10 +37,10 @@ class LoginForm(forms.Form):
         max_length=150,
         widget=forms.TextInput(attrs={
             'class': 'form-control form-control-lg',
-            'placeholder': 'Username',
+            'placeholder': 'Username or Email',
             'autofocus': True
         }),
-        label='Username'
+        label='Username or Email'
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={

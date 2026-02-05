@@ -52,6 +52,38 @@
       --glass-border: hsla(220, 30%, 25%, 0.3);
     }
 
+    /* Enhanced Dark Mode Input Visibility Strategy */
+    [data-theme="dark"] input,
+    [data-theme="dark"] textarea,
+    [data-theme="dark"] select,
+    [data-theme="dark"] .form-control {
+      color: var(--text-primary) !important;
+      -webkit-text-fill-color: var(--text-primary) !important;
+      caret-color: var(--text-primary) !important;
+    }
+
+    /* Hide default browser password toggle */
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none;
+    }
+
+    /* WebKit Autofill Override for Dark Mode */
+    [data-theme="dark"] input:-webkit-autofill,
+    [data-theme="dark"] input:-webkit-autofill:hover,
+    [data-theme="dark"] input:-webkit-autofill:focus,
+    [data-theme="dark"] textarea:-webkit-autofill,
+    [data-theme="dark"] textarea:-webkit-autofill:hover,
+    [data-theme="dark"] textarea:-webkit-autofill:focus,
+    [data-theme="dark"] select:-webkit-autofill,
+    [data-theme="dark"] select:-webkit-autofill:hover,
+    [data-theme="dark"] select:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--text-primary) !important;
+      -webkit-box-shadow: 0 0 0px 1000px var(--bg-hover) inset !important;
+      transition: background-color 5000s ease-in-out 0s;
+      caret-color: var(--text-primary) !important;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -63,7 +95,7 @@
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       color: var(--text-primary);
-      transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -97,6 +129,14 @@
       -webkit-text-fill-color: transparent;
       text-decoration: none;
       letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-brand span {
+      -webkit-text-fill-color: initial;
+      color: var(--brand-primary);
     }
 
     .btn-premium {
@@ -188,18 +228,14 @@
   <nav class="navbar">
     <div class="container">
       <a class="navbar-brand" href="/">
-        📋 TASK.IO
+        <span>☑</span> Task Organizer
       </a>
 
       <div class="nav-links" style="display: flex; gap: 1rem; align-items: center;">
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
           <span id="theme-icon">🌙</span>
         </button>
-        {% if not user.is_authenticated %}
-        <a href="{% url 'login' %}"
-          style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Login</a>
-        <a href="{% url 'register' %}" class="btn-premium">Register</a>
-        {% endif %}
+
       </div>
     </div>
   </nav>

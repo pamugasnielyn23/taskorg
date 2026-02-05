@@ -28,6 +28,8 @@
     padding: 0 2rem 2rem;
     text-align: center;
     margin-top: -60px;
+    position: relative;
+    z-index: 10;
   }
 
   .profile-avatar {
@@ -128,12 +130,7 @@
 
 <div class="profile-wrapper">
   <div class="glass-card profile-card">
-    <div class="profile-banner">
-      <a href="{% url 'profile_edit' %}" class="btn-premium"
-        style="position: absolute; top: 1.5rem; right: 1.5rem; padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--bg-glass); color: var(--text-primary); backdrop-filter: blur(5px); box-shadow: none;">
-        ✏️ EDIT PROFILE
-      </a>
-    </div>
+    <div class="profile-banner"></div>
 
     <div class="profile-header">
       <div class="profile-avatar">
@@ -151,6 +148,11 @@
         {% endif %}
       </h1>
       <div class="profile-username">@{{ user.username }}</div>
+
+      <a href="{% url 'profile_edit' %}" class="btn-premium"
+        style="padding: 0.6rem 1.5rem; font-size: 0.9rem; background: var(--bg-hover); color: var(--text-primary); border: 1px solid var(--border-color); box-shadow: none; display: inline-flex; width: auto;">
+        Edit Profile
+      </a>
     </div>
 
     <div class="profile-body">

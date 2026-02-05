@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Manila'
 
 USE_I18N = True
 
@@ -131,3 +131,38 @@ LOGOUT_REDIRECT_URL = '/security_management/login/'
 # Media files (Uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Email Configuration (Console backend for development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For production, use SMTP:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com'
+# EMAIL_HOST_PASSWORD = 'your-app-password'
+
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
+
+# Load environment variables for email (if .env file exists)
+import os
+from pathlib import Path
+
+# Try to load dotenv
+try:
+    from dotenv import load_dotenv
+    env_path = BASE_DIR / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+        # If credentials are set, use Gmail SMTP
+        if os.getenv('EMAIL_HOST_USER') and os.getenv('EMAIL_HOST_PASSWORD'):
+            if os.getenv('EMAIL_HOST_USER') != 'your-email@gmail.com':
+                EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+                EMAIL_HOST = 'smtp.gmail.com'
+                EMAIL_PORT = 587
+                EMAIL_USE_TLS = True
+                EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+                EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+                DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+except ImportError:
+    pass

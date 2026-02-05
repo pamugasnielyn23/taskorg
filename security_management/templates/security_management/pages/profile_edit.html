@@ -148,6 +148,34 @@
     .btn-back:hover {
         color: var(--brand-primary);
     }
+
+    /* File Input Styling */
+    input[type="file"] {
+        color: var(--text-primary);
+        width: 100%;
+        background: var(--bg-hover);
+        padding: 0.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    input[type="file"]::file-selector-button {
+        background: var(--brand-primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 1rem;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+        background: var(--brand-secondary);
+        transform: translateY(-1px);
+    }
 </style>
 
 <div class="edit-wrapper">
@@ -163,7 +191,16 @@
 
         <div class="glass-card edit-card">
             <div class="edit-header">
-                <h1>✏️ Edit Profile</h1>
+                <h1>
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 0.5rem; vertical-align: middle; color: var(--brand-primary);">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                        </svg>
+                    </span>
+                    Edit Profile
+                </h1>
                 <p>Update your personal information</p>
             </div>
 
@@ -181,13 +218,47 @@
                     <div class="avatar-controls">
                         <h3>Profile Picture</h3>
                         <p>Format: JPG, PNG, GIF. Max Size: 2MB.</p>
-                        <div style="max-width: 200px; margin: 0 auto;">
-                            {{ form.profile_picture }}
+                        <div style="max-width: 250px; margin: 0 auto; position: relative;">
+                            <label for="id_profile_picture" class="btn-premium"
+                                style="width: 100%; justify-content: center; cursor: pointer; padding: 0.8rem; background: var(--bg-hover); color: var(--text-primary); border: 1px solid var(--border-color); box-shadow: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" style="margin-right: 0.5rem;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                Choose Image
+                            </label>
+                            <div id="file-name"
+                                style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); min-height: 1.2em;">
+                            </div>
+                            <div style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+                                {{ form.profile_picture }}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-body">
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const fileInput = document.getElementById('id_profile_picture');
+                            const fileNameDisplay = document.getElementById('file-name');
+
+                            if (fileInput) {
+                                fileInput.addEventListener('change', function (e) {
+                                    if (e.target.files.length > 0) {
+                                        fileNameDisplay.textContent = e.target.files[0].name;
+                                        // Update label style to indicate active
+                                        e.target.closest('div').querySelector('label').style.borderColor = 'var(--brand-primary)';
+                                        e.target.closest('div').querySelector('label').style.color = 'var(--brand-primary)';
+                                    }
+                                });
+                            }
+                        });
+                    </script>
+
                     <div class="form-group">
                         <label for="id_username">Username</label>
                         {{ form.username }}

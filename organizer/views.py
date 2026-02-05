@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
@@ -40,7 +41,53 @@ def dashboard(request):
         tasks = tasks.filter(due_date__lt=timezone.now(), status__in=['Pending', 'In Progress'])
     
     tasks = tasks.order_by('-created_at')
-    return render(request, 'organizer/dashboard.html', {'tasks': tasks, 'view': view})
+    
+    # Weekly Analytics Data (Monday to Sunday)
+    today = timezone.localdate()
+    start_of_week = today - timedelta(days=today.weekday())  # Monday
+    end_of_week = start_of_week + timedelta(days=6)         # Sunday
+    
+    # Get completions for the current week
+    completions = Task.objects.filter(
+        user=request.user,
+        status='Completed',
+        completed_at__date__gte=start_of_week,
+        completed_at__date__lte=end_of_week
+    )
+    
+    # Build chart data (always 7 days Mon-Sun)
+    chart_data = []
+    for i in range(7):
+        day = start_of_week + timedelta(days=i)
+        count = completions.filter(completed_at__date=day).count()
+        chart_data.append({
+            'label': day.strftime('%a'),
+            'count': count,
+            'percent': 0 # Will calculate relative to max below
+        })
+    
+    # Find max to calculate relative heights
+    max_count = max([d['count'] for d in chart_data]) if chart_data else 0
+    if max_count > 0:
+        for d in chart_data:
+            d['percent'] = int((d['count'] / max_count) * 100)
+    else:
+        # Default fallback if no data
+        for d in chart_data:
+            d['percent'] = 5
+            
+    # Determine greeting based on session flag set during login
+    greeting = "Welcome" if request.session.get('is_first_login') else "Welcome back"
+    
+    context = {
+        'tasks': tasks,
+        'view': view,
+        'greeting': greeting,
+        'chart_data': chart_data,
+        'weekly_total': completions.count()
+    }
+    
+    return render(request, 'organizer/dashboard.html', context)
 
 @login_required
 def vault_view(request):
@@ -118,6 +165,7 @@ def task_delete(request, task_id):
 def task_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id, user=request.user)
     task.status = 'Completed'
+    task.completed_at = timezone.now()
     task.save()
     
     # Handle Recurrence
@@ -196,12 +244,12 @@ def export_tasks_csv(request):
 
 @login_required
 def today_view(request):
-    today = timezone.now().date()
+    today = timezone.localdate()
     tasks = Task.objects.filter(
+        Q(created_at__date=today) | Q(due_date__date=today) | ~Q(status='Completed'),
         user=request.user, 
-        is_archived=False,
-        due_date__date=today
-    ).order_by('priority')
+        is_archived=False
+    ).distinct().order_by('priority')
     return render(request, 'organizer/today.html', {'tasks': tasks})
 
 # @login_required

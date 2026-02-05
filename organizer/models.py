@@ -32,6 +32,7 @@ class Task(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     reminder_time = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
     
     # New fields
     is_archived = models.BooleanField(default=False)

@@ -1,6 +1,6 @@
 ﻿{% extends "organizer/base.html" %}
 
-{% block title %}Dashboard | TASK.IO{% endblock %}
+{% block title %}Dashboard | Task Organizer{% endblock %}
 
 {% block content %}
 <style>
@@ -12,7 +12,7 @@
     }
 
     .welcome-section {
-        margin-bottom: -0.5rem;
+        margin-bottom: 2rem;
         animation: fadeIn 0.8s ease;
     }
 
@@ -53,6 +53,12 @@
         border-bottom-color: var(--brand-primary);
         outline: none;
         padding: 0 0.5rem;
+    }
+
+    [data-theme="dark"] .username-input {
+        background: none;
+        -webkit-text-fill-color: var(--text-primary);
+        color: var(--text-primary);
     }
 
     .welcome-section p {
@@ -260,14 +266,14 @@
     .filter-group {
         display: flex;
         background: var(--bg-hover);
-        padding: 0.3rem;
-        border-radius: 12px;
+        padding: 0.35rem;
+        border-radius: 50px;
         gap: 0.25rem;
     }
 
     .filter-chip {
-        padding: 0.5rem 1.25rem;
-        border-radius: 10px;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
         border: none;
         background: transparent;
         color: var(--text-secondary);
@@ -280,7 +286,7 @@
     .filter-chip.active {
         background: var(--bg-card);
         color: var(--brand-primary);
-        box-shadow: var(--shadow-sm);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     /* Task Card Evolution */
@@ -416,59 +422,59 @@
     }
 </style>
 
+{% if view == 'today' %}
+<div style="margin-bottom: 2rem;">
+    <a href="{% url 'organizer_dashboard' %}" class="task-action-btn"
+        style="display: inline-block; text-decoration: none; background: hsla(260, 70%, 60%, 0.1); border-color: transparent; color: var(--brand-primary);">
+        ⬅ BACK TO DASHBOARD
+    </a>
+</div>
+{% endif %}
+
+{% if view != 'today' %}
 <div class="welcome-section">
-    <h1>Welcome back,
-        <input type="text" class="username-input" value="{{ user.username }}" id="dashUsername"
-            onblur="updateUsername(this.value)" onkeydown="if(event.key==='Enter') this.blur()"
-            title="Click to edit username">
+    <h1>{{ greeting }},
+        <span class="user-name-highlight" style="color: var(--brand-primary);">{{ user.username }}</span>
     </h1>
     <p>Operational status is nominal. You have <span style="color: var(--brand-primary); font-weight: 700;"
             id="welcomePending">0</span> objectives pending.</p>
 </div>
+{% endif %}
 
+{% if view != 'today' %}
 <div class="dashboard-grid">
     <!-- Premium Analytics -->
     <div class="analytics-section">
         <div class="glass-card analytics-card">
             <div class="analytics-header">
-                <h2>📈 WEEKLY ANALYTICS</h2>
+                <div>
+                    <h2>WEEKLY ANALYTICS</h2>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+                        <strong>{{ weekly_total|default:0 }}</strong> tasks completed this week
+                    </p>
+                </div>
                 <div class="meta-tag">PAST 7 DAYS</div>
             </div>
             <div class="weekly-chart">
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 40%"></div>
-                    <span class="bar-label">Mon</span>
+                {% for day in chart_data %}
+                <div class="chart-bar-wrapper" title="{{ day.count }} tasks completed">
+                    <div class="chart-bar" style="height: {{ day.percent }}%">
+                        {% if day.count > 0 %}
+                        <span
+                            style="position: absolute; top: -20px; font-size: 0.7rem; font-weight: 800; color: var(--brand-primary); width: 100%; text-align: center;">
+                            {{ day.count }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <span class="bar-label">{{ day.label }}</span>
                 </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 70%"></div>
-                    <span class="bar-label">Tue</span>
-                </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 55%"></div>
-                    <span class="bar-label">Wed</span>
-                </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 90%"></div>
-                    <span class="bar-label">Thu</span>
-                </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 30%"></div>
-                    <span class="bar-label">Fri</span>
-                </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 60%"></div>
-                    <span class="bar-label">Sat</span>
-                </div>
-                <div class="chart-bar-wrapper">
-                    <div class="chart-bar" style="height: 85%"></div>
-                    <span class="bar-label">Sun</span>
-                </div>
+                {% endfor %}
             </div>
         </div>
 
         <div class="glass-card analytics-card score-display">
             <div class="analytics-header">
-                <h2>🎯 DAILY SCORE</h2>
+                <h2>DAILY SCORE</h2>
             </div>
             <div class="score-circle-outer">
                 <svg class="score-circle-svg" viewBox="0 0 100 100">
@@ -485,148 +491,129 @@
 
     <!-- Quick Stats Tray -->
     <div class="stats-tray">
-        <div class="glass-card stat-pill">
-            <div class="stat-icon-box">📊</div>
+        <div class="glass-card stat-pill" onclick="filterTasks('all')" style="cursor: pointer;">
+            <div class="stat-icon-box">✓</div>
             <div class="stat-data">
                 <div class="value">{{ tasks.count }}</div>
                 <div class="label">Total Tasks</div>
             </div>
         </div>
-        <div class="glass-card stat-pill">
+        <div class="glass-card stat-pill" onclick="filterTasks('pending')" style="cursor: pointer;">
             <div class="stat-icon-box">⏳</div>
             <div class="stat-data">
                 <div class="value" id="pendingCount">0</div>
                 <div class="label">Pending</div>
             </div>
         </div>
-        <div class="glass-card stat-pill">
+        <div class="glass-card stat-pill" onclick="filterTasks('completed')" style="cursor: pointer;">
             <div class="stat-icon-box">✨</div>
             <div class="stat-data">
                 <div class="value" id="completedCount">0</div>
                 <div class="label">Fulfilled</div>
             </div>
         </div>
-        <div class="glass-card stat-pill">
-            <div class="stat-icon-box">🔥</div>
+        <div class="glass-card stat-pill" onclick="filterTasks('overdue')" style="cursor: pointer;">
+            <div class="stat-icon-box" style="color: var(--danger);">★</div>
             <div class="stat-data">
                 <div class="value" id="overdueCount">0</div>
                 <div class="label">Overdue</div>
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if view != 'today' %}
     <!-- Controls & Filters -->
-    <div class="controls-bar">
-        <div class="search-pill">
-            <span>🔍</span>
-            <input type="text" id="searchInput" placeholder="Scan identifiers..." onkeyup="searchTasks()">
-        </div>
+    <div class="controls-bar"
+        style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
         <div class="filter-group">
             <button class="filter-chip active" data-filter="all" onclick="filterTasks('all')">ALL</button>
             <button class="filter-chip" data-filter="pending" onclick="filterTasks('pending')">ACTIVE</button>
             <button class="filter-chip" data-filter="completed" onclick="filterTasks('completed')">DONE</button>
             <button class="filter-chip" data-filter="high" onclick="filterTasks('high')">URGENT</button>
             <button class="filter-chip" data-filter="medium" onclick="filterTasks('medium')">MEDIUM</button>
+            <button class="filter-chip" data-filter="low" onclick="filterTasks('low')">LOW</button>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
-            <select class="filter-chip" id="sortSelect" onchange="sortTasks()"
-                style="background: var(--bg-card); cursor: pointer; border: 1px solid var(--border-color);">
-                <option value="newest">NEWEST</option>
-                <option value="oldest">OLDEST</option>
-                <option value="due-date">SCHEDULE</option>
-                <option value="priority">PRIORITY</option>
-            </select>
-            <a href="{% url 'task_create' %}" class="btn-premium">⚡ ADD TASK</a>
-        </div>
+
+
+        <a href="{% url 'task_create' %}{% if view == 'today' %}?due_date={% now 'Y-m-d' %}{% endif %}"
+            class="btn-premium">⚡ ADD TASK</a>
     </div>
+</div>
+{% endif %}
 
-    <!-- Tasks Collection -->
-    <div class="task-stack" id="tasksContainer">
-        {% if tasks %}
-        {% for task in tasks %}
-        <div class="glass-card task-card priority-{{ task.priority|lower }}" data-priority="{{ task.priority|lower }}"
-            data-status="{{ task.status|lower }}" data-title="{{ task.title|lower }}"
-            data-due="{{ task.due_date|date:'Y-m-d'|default:'' }}" data-created="{{ task.created_at|date:'Y-m-d' }}"
-            data-overdue="{% if task.is_overdue %}true{% else %}false{% endif %}">
+<!-- Tasks Collection -->
+<div class="task-stack" id="tasksContainer">
+    {% if tasks %}
+    {% for task in tasks %}
+    <div class="glass-card task-card priority-{{ task.priority|lower }}" data-priority="{{ task.priority|lower }}"
+        data-status="{{ task.status|lower }}" data-title="{{ task.title|lower }}"
+        data-due="{{ task.due_date|date:'Y-m-d'|default:'' }}" data-created="{{ task.created_at|date:'Y-m-d' }}"
+        data-overdue="{% if task.is_overdue %}true{% else %}false{% endif %}">
 
-            <div class="title">
-                {{ task.title }}
-                {% if task.recurrence != 'none' %}
-                <span title="Automated Core: {{ task.recurrence }}" style="opacity: 0.6;">🔄</span>
-                {% endif %}
-            </div>
-
-            {% if task.description %}
-            <p class="task-desc">{{ task.description }}</p>
+        <div class="title">
+            {{ task.title }}
+            {% if task.recurrence != 'none' %}
+            <span title="Automated Core: {{ task.recurrence }}" style="opacity: 0.6;">↻</span>
             {% endif %}
-
-            <div class="task-meta-tray">
-                {% if task.due_date %}
-                <span class="meta-tag {% if task.is_overdue %}overdue{% endif %}">
-                    📅 {{ task.due_date|date:"M d" }}
-                </span>
-                {% endif %}
-                <span class="meta-tag">📌 {{ task.status|upper }}</span>
-                {% if task.category %}
-                <span class="meta-tag">🏷️ {{ task.category|upper }}</span>
-                {% endif %}
-            </div>
-
-            <div class="actions-grid">
-                <button class="task-action-btn" onclick="startFocus('{{ task.title|escapejs }}')"
-                    style="background: hsla(260, 70%, 60%, 0.1); border-color: transparent; color: var(--brand-primary);">
-                    ⏱️ FOCUS
-                </button>
-                <a href="{% url 'task_update' task.pk %}" class="task-action-btn">✏️ EDIT</a>
-                {% if task.status != 'Completed' %}
-                <a href="{% url 'task_complete' task.pk %}" class="btn-done task-action-btn">✅ COMPLETE</a>
-                {% endif %}
-                <a href="{% url 'task_vault' task.pk %}" class="task-action-btn">📦 ARCHIVE</a>
-            </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="glass-card" style="grid-column: 1/-1; padding: 5rem; text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🛰️</div>
-            <h3 style="font-family: 'Outfit'; margin-bottom: 0.5rem;">WORKSPACE EMPTY</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Ready for mission deployment? Create your first
-                task.</p>
-        </div>
+
+        {% if task.description %}
+        <p class="task-desc">{{ task.description }}</p>
         {% endif %}
+
+        <div class="task-meta-tray">
+            {% if task.due_date %}
+            <span class="meta-tag {% if task.is_overdue %}overdue{% endif %}">
+                {{ task.due_date|date:"M d" }}
+            </span>
+            {% endif %}
+            <span class="meta-tag">{{ task.status|upper }}</span>
+            {% if task.category %}
+            <span class="meta-tag">{{ task.category|upper }}</span>
+            {% endif %}
+        </div>
+
+        <div class="actions-grid">
+            <a href="{% url 'task_delete' task.pk %}" class="task-action-btn"
+                style="background: hsla(0, 70%, 60%, 0.1); border-color: transparent; color: var(--danger);">
+                🗑️ DELETE
+            </a>
+            <a href="{% url 'task_update' task.pk %}" class="task-action-btn">✏️ EDIT</a>
+            {% if task.status != 'Completed' %}
+            <a href="{% url 'task_complete' task.pk %}" class="btn-done task-action-btn">✅ COMPLETE</a>
+            {% endif %}
+            <a href="{% url 'task_vault' task.pk %}" class="task-action-btn">ARCHIVE</a>
+        </div>
     </div>
+    {% endfor %}
+    {% else %}
+    <div class="glass-card" style="grid-column: 1/-1; padding: 5rem; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">○</div>
+        <h3 style="font-family: 'Outfit'; margin-bottom: 0.5rem;">WORKSPACE EMPTY</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Ready for mission deployment? Create your first
+            task.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Motivational Footer -->
+<div style="margin-top: 3rem; text-align: center; padding-bottom: 2rem; opacity: 0.8;">
+    <div
+        style="font-family: 'Outfit'; font-style: italic; font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted);">
+        "The secret of getting ahead is getting started."
+    </div>
+    <a href="{% url 'task_create' %}{% if view == 'today' %}?due_date={% now 'Y-m-d' %}{% endif %}" class="btn-premium"
+        style="display: inline-block; padding: 0.8rem 2rem;">
+        ⚡ ADD NEW TASK
+    </a>
+</div>
 </div>
 
 
 
 <script>
-    function updateUsername(newUsername) {
-        if (!newUsername || newUsername.trim() === '') return;
 
-        fetch('{% url "update_username" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ username: newUsername })
-        })
-            .then(response => {
-                if (response.ok) {
-                    const input = document.getElementById('dashUsername');
-                    input.style.borderBottomColor = 'var(--success)';
-                    setTimeout(() => input.style.borderBottomColor = 'transparent', 1500);
-                } else {
-                    response.json().then(data => {
-                        alert('Update failed: ' + (data.message || 'Unknown error'));
-                        location.reload();
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('A network error occurred.');
-            });
-    }
 
 
     function updateStats() {
@@ -670,7 +657,10 @@
             else if (f === 'completed') c.classList.toggle('hidden', c.dataset.status !== 'completed');
             else if (f === 'high') c.classList.toggle('hidden', c.dataset.priority !== 'high');
             else if (f === 'medium') c.classList.toggle('hidden', c.dataset.priority !== 'medium');
+            else if (f === 'low') c.classList.toggle('hidden', c.dataset.priority !== 'low');
+            else if (f === 'overdue') c.classList.toggle('hidden', c.dataset.overdue !== 'true');
         });
+
     }
 
     function sortTasks() {

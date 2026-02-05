@@ -1,6 +1,6 @@
 {% extends "organizer/base.html" %}
 
-{% block title %}Today's Directives | TASK.IO{% endblock %}
+{% block title %}Today's Directives | Task Organizer{% endblock %}
 
 {% block content %}
 <style>
@@ -139,11 +139,11 @@
             </div>
         </div>
         <div style="display: flex; gap: 0.75rem;">
-            <button class="task-action-btn" onclick="startFocus('{{ task.title|escapejs }}')"
-                style="background: hsla(260, 70%, 60%, 0.1); border-color: transparent; color: var(--brand-primary); padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; cursor: pointer;">
-                ⏱️ FOCUS
-            </button>
-            <button class="btn-premium" onclick="location.href='{% url 'task_complete' task.pk %}'"
+            <a href="{% url 'task_delete' task.pk %}" class="task-action-btn"
+                style="background: hsla(0, 70%, 60%, 0.1); border-color: transparent; color: var(--danger); padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 700; border-radius: 8px; cursor: pointer; text-decoration: none;">
+                🗑️ DELETE
+            </a>
+            <button class="btn-premium" onclick="location.href='{% url 'task_complete' task.pk %}';"
                 style="padding: 0.6rem 1.25rem; font-size: 0.8rem;">
                 ✅ COMPLETE
             </button>

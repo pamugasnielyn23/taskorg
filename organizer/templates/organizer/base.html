@@ -60,6 +60,32 @@
             --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
+        /* Enhanced Dark Mode Input Visibility Strategy */
+        [data-theme="dark"] input,
+        [data-theme="dark"] textarea,
+        [data-theme="dark"] select,
+        [data-theme="dark"] .form-control {
+            color: var(--text-primary) !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            caret-color: var(--text-primary) !important;
+        }
+
+        /* WebKit Autofill Override for Dark Mode */
+        [data-theme="dark"] input:-webkit-autofill,
+        [data-theme="dark"] input:-webkit-autofill:hover,
+        [data-theme="dark"] input:-webkit-autofill:focus,
+        [data-theme="dark"] textarea:-webkit-autofill,
+        [data-theme="dark"] textarea:-webkit-autofill:hover,
+        [data-theme="dark"] textarea:-webkit-autofill:focus,
+        [data-theme="dark"] select:-webkit-autofill,
+        [data-theme="dark"] select:-webkit-autofill:hover,
+        [data-theme="dark"] select:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--text-primary) !important;
+            -webkit-box-shadow: 0 0 0px 1000px var(--bg-hover) inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+            caret-color: var(--text-primary) !important;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -72,8 +98,19 @@
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.5;
-            transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-x: hidden;
+        }
+
+        .glass-card,
+        .nav-container,
+        .sidebar,
+        .task-card,
+        input,
+        select,
+        textarea,
+        button {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
         h1,
@@ -127,8 +164,13 @@
             letter-spacing: -0.02em;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
             transition: transform 0.2s ease;
+        }
+
+        .nav-brand span {
+            -webkit-text-fill-color: initial !important;
+            color: var(--brand-primary);
         }
 
         .nav-brand:hover {
@@ -214,12 +256,12 @@
         .user-avatar {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 8px;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--text-primary);
             font-weight: 700;
             font-family: 'Outfit';
         }
@@ -423,8 +465,19 @@
     <nav>
         <div class="nav-container">
             <a href="{% url 'organizer_dashboard' %}" class="nav-brand">
-                <span>📋</span> TASK.IO
+                <span>☑</span> Task Organizer
             </a>
+
+            <!-- Search Bar in Navbar -->
+            <div class="nav-search" style="flex-grow: 1; max-width: 400px; margin: 0 2rem;">
+                <div style="position: relative; width: 100%;">
+                    <span
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); opacity: 0.6; pointer-events: none;">⌕</span>
+                    <input type="text" id="searchInput" placeholder="Search tasks..."
+                        onkeyup="if(window.searchTasks) searchTasks()"
+                        style="width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border-radius: 50px; border: 1px solid var(--border-color); background: var(--bg-hover); color: var(--text-primary); outline: none; transition: all 0.2s ease;">
+                </div>
+            </div>
 
             <div class="nav-right">
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
@@ -435,38 +488,38 @@
                 <div class="user-dropdown">
                     <div class="dropdown-toggle">
                         <div class="user-avatar">
-                            {{ user.username|upper|slice:":1" }}
-                        </div>
-                        <div class="user-info">
-                            <span class="user-label">Authorized</span>
-                            <span class="user-name">{{ user.username }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
                         </div>
                     </div>
 
                     <div class="dropdown-menu">
                         <div
                             style="padding: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.5rem;">
-                            <div style="font-weight: 800; font-family: 'Outfit'; color: var(--text-primary);">{{
-                                user.username }}</div>
                             <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}</div>
                         </div>
                         <a href="{% url 'profile' %}" class="dropdown-item">
-                            <span>👤</span> Profile Settings
+                            Profile Settings
                         </a>
                         <a href="{% url 'organizer_dashboard' %}?view=today" class="dropdown-item">
-                            <span>📅</span> Today's Tasks
+                            Today's Tasks
                         </a>
                         <a href="{% url 'vault_list' %}" class="dropdown-item">
-                            <span>📦</span> Archived Tasks
+                            Archived Tasks
                         </a>
                         <div class="dropdown-divider"></div>
                         <a href="{% url 'logout' %}" class="dropdown-item dropdown-item-danger">
-                            <span>🚪</span> Logout
+                            Logout
                         </a>
                     </div>
                 </div>
                 {% else %}
-                <a href="{% url 'login' %}" class="btn-premium">🔐 Access Workspace</a>
+                <a href="{% url 'login' %}" class="btn-premium">Access Workspace</a>
                 {% endif %}
             </div>
         </div>
@@ -477,7 +530,6 @@
         {% if messages %}
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
-            {% if message.tags == 'success' %}✨{% else %}⚠️{% endif %}
             <span>{{ message }}</span>
         </div>
         {% endfor %}
